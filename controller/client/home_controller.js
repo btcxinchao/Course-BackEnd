@@ -1,4 +1,5 @@
 
 module.exports.home = (req,res)=>{
-    res.render("/client/pages/hoem/index")
+    res.render("client/pages/home/index")
+    
 }
