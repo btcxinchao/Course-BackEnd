@@ -1,0 +1,111 @@
+extends ../../layouts/default_admin.pug
+
+block main
+  .page-title
+    h1 Danh sách sản phẩm
+    a(class="btn btn-primary" href= `${prefixAdmin}/product/create`) Thêm sản phẩm mới
+
+  
+  .card-surface
+    // Bộ lọc và Tìm kiếm
+    .mb-3
+      .filters-toolbar.d-flex.justify-content-between.align-items-center
+        .btn-group
+          button(class=`btn btn-sm ml-1 ${currentStatus === '' ? 'btn-success' : 'btn-outline-success'}` , button-status="") Tất cả
+          button(class=`btn btn-sm ml-1 ${currentStatus === 'active' ? 'btn-success' : 'btn-outline-success'}` , button-status="active") Hoạt động
+          button(class=`btn btn-sm ml-1 ${currentStatus === 'inactive' ? 'btn-success' : 'btn-outline-success'}` , button-status="inactive") Dừng hoạt động
+        form#form-search.form-inline.ml-2
+          .input-group.input-group-sm
+            input.form-control(type="text", placeholder="Nhập từ khóa tìm kiếm", name="keyword" value=keyword)
+            .input-group-append
+              button.btn.btn-success(type="submit") Tìm
+
+    // Form thay đổi nhiều (multi)
+    .card.mb-3
+      .card-header Danh sách
+      .card-body
+        form(action=`${prefixAdmin}/products/change-multi?_method=PATCH` method="POST" id="form-change-multi" form-change-multi)
+          .d-flex.align-items-start
+            .form-group
+              select(name="type" class="form-control")
+                option(disabled selected) -- Chọn tất cả --
+                option(value="active") Hoạt động
+                option(value="inactive") Dừng hoạt động
+                option(value="deleteAll") Xóa tất cả 
+            .form-group
+              input(type="text" name="ids" value="" class="form-control d-none")
+            button(type="submit" class="btn btn-primary") Áp dụng
+
+    .table-responsive
+      table(class= "table table-hover"
+            checkbox-multi name="checkall")
+        thead
+          tr
+            th 
+              input(type="checkbox" name="checkall")
+            th STT
+            th Hình ảnh
+            th Tiêu đề
+            th Giá
+            th Vị trí
+            th Trạng thái
+            th Hành động
+        tbody
+          if products && products.length > 0
+            each item, index in products
+              tr 
+                td 
+                  input(type="checkbox" name="id" value= item.id)
+                td= index + 1
+                td
+                  if item.thumbnail
+                    img(src=item.thumbnail, alt=item.title, style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;")
+                  else
+                    .placeholder-image(style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px;") No image
+                td= item.title || 'Chưa có tiêu đề'
+                td= item.price ? item.price.toLocaleString('vi-VN') + ' VNĐ' : 'Chưa có giá'
+                td= item.position 
+                td
+                  if (item.status === 'active')
+                    a(href=`javascript:;`
+                      class="badge badge-success"
+                      data-status="active"
+                      data-id=item.id
+                      button-change-status
+                    ) Hoạt động
+                  else if (item.status === 'inactive')
+                    a(href=`javascript:;`
+                      class="badge badge-danger"
+                      data-status="inactive"
+                      data-id=item.id
+                      button-change-status
+                    ) Không hoạt động
+                  else
+                    a(href="#" class="badge badge-warning") Chưa xác định
+                td
+                  .btn-group(role="group")
+                    a(href=`${prefixAdmin}/product/edit/${item.id}` class="btn btn-sm btn-warning" ) Chỉnh Sửa
+                    button(class="btn btn-sm btn-danger"
+                           data-id=item.id
+                           button-delete
+                           ) Xóa
+                    a(href=`${prefixAdmin}/product/detail/${item.id}` class="btn btn-sm btn-secondary" ) Chi tiết
+          else
+            tr
+              td.text-center(colspan="6") Chưa có item nào 
+
+  nav 
+    ul.pagination
+      if (pagination.currentPage > 1)
+        li(class=`page-item`)
+          button(class="page-link" button-pagination=pagination.currentPage - 1) Trang Trước
+      - for (var i = 1; i <= pagination.totalPage; i++)
+        li(class=`page-item ${pagination.currentPage === i ? "active" : ""}`)
+          button.page-link(button-pagination=i) #{i}
+      if (pagination.currentPage < pagination.totalPage)
+        li.page-item
+          button(class="page-link" button-pagination=pagination.currentPage + 1) Trang Sau
+  
+  form(action="", method="POST" id="form-change-status" data-path=`${prefixAdmin}/product/change-status`) 
+  form(action="", method="POST" id="form-delete-item" data-path=`${prefixAdmin}/product/delete`) 
+  script(src="/admin/js/product.js")

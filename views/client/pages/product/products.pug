@@ -1,0 +1,27 @@
+extends ../../layouts/default.pug
+
+block content 
+  h1 Trang Sản phẩm
+
+  ul  
+    li 
+      a(href="/") Trang Chủ
+
+  .products
+    .container.my-3
+      .row
+        .col-12
+          .box-head
+            h2.inner-title Danh sách sản phẩm
+      .row
+        each item in products
+          .col-4.mb-3
+            .product-item 
+              .inner-image
+                img(src=item.thumbnail, alt=item.title)
+              .inner-content
+                h3.inner-title 
+                a(href=`/products/${item.slug}`)  #{item.title}
+                .inner-price-new #{item.price}$
+                .inner-price-old 100$ 
+                .inner-discount #{item.discountPercent}%

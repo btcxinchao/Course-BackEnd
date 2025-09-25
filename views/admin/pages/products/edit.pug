@@ -1,0 +1,62 @@
+
+extends ../../layouts/default_admin.pug
+
+block main
+  h1(class ="mb-4") Chỉnh sửa sản phẩm
+
+  form(
+      action=`${prefixAdmin}/product/edit/${products._id}?_method=PATCH` 
+      method="POST" 
+      enctype="multipart/form-data"
+      id="form-edit-product"
+      )
+    .form-group
+      label(for="title") Tiêu đề
+      input(type="text" class="form-control" name="title" value=products.title id="title" required )
+
+    .form-group
+      label(for="desc") Mô tả
+      textarea.form-control(name="description" value=products.description id="desc" rows="5") #{products.description}
+
+    .form-group
+      label(for="price") Giá
+      input.form-control#price(type="number" value=products.price name="price" ) 
+
+    .form-group
+      label(for="discount") % Giảm giá
+      input.form-control(type="number" id="discount" value=products.discountpercent name="discount" )
+
+    .form-group
+      label(for="stock") Số lượng
+      input.form-control#stock(type="number" value=products.stock name="stock" )
+
+    div(class="form-group" uploads-image)
+      label(for="thumbnail") Ảnh
+      input(type="file" class="form-control-file" uploads-image-input name="thumbnail" accept="image/*")
+      div(uploads-image-wrapper style="position: relative;")
+        img(
+            src=products.thumbnail 
+            uploads-image-preview
+            style=`max-width:200px; ${products.thumbnail ? '' : 'display:none;'}`
+            )
+        button(type="button" class="btn-close" aria-label="Close" uploads-image-remove style="display:none; position: absolute; top:5px; right:5px; background: #fff; border: none; font-size:18px; cursor:pointer;") X
+
+
+    .form-group
+      label(for="position") Vị trí
+      select.form-control#position(name="position" ) 
+         option(placeholder="Tự động tăng" value= products.position)  #{products.position}
+
+    .form-group
+      label Trạng thái
+        .form-check
+            input.form-check-input(type="radio" id="status-active" name="status" value="active" checked=(products.status === 'active'))
+            label.form-check-label(for="status-active") Hoạt động
+        .form-check
+            input.form-check-input(type="radio" id="status-inactive" name="status" value="inactive" checked=(products.status === 'inactive'))
+            label.form-check-label(for="status-inactive") Dừng hoạt động    
+
+
+    button.btn.btn-primary(type="submit") Cập nhật
+
+    script(src="/admin/js/product.js") 
